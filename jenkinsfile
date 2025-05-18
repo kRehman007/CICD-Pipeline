@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'Nodejs'  // Your configured NodeJS tool name
+    }
+
+    environment {
+        SONAR_TOKEN = credentials('sonarqube-token-id')   // SonarQube token ID in Jenkins
+        GITHUB_TOKEN = credentials('github-token-id')     // GitHub PAT token ID in Jenkins
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git credentialsId: 'github-token-id', url: 'https://github.com/kRehman007/CICD-Pipeline.git'
+            }
+        }
+
+        stage('Install dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('SonarQube analysis') {
+            steps {
+                withSonarQubeEnv('SonarQubeServer') {
+                    sh "npx sonar-scanner -Dsonar.login=${SONAR_TOKEN}"
+                }
+            }
+        }
+
+        stage('Build React app') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('Deploy to GitHub Pages') {
+            steps {
+                sh '''
+                    npm install -g gh-pages
+                    git config --global user.email "kashisial2327@gmail.com"
+                    git config --global user.name "kRehman007"
+                    gh-pages -d build --repo https://${GITHUB_TOKEN}@github.com/kRehman007/CICD-Pipeline.git
+                '''
+            }
+        }
+    }
+}
