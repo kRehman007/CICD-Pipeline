@@ -11,5 +11,5 @@ jobs:
     steps:
       - name: Trigger Jenkins
         run: |
-          curl -X POST "https://a52b-103-70-251-194.ngrok-free.app/job/CICD PipeLine/build" \
+          curl -X POST "https://a52b-103-70-251-194.ngrok-free.app/jenkins/job/CICD%20PipeLine/build" \
             --user "${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }}"
